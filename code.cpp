@@ -59,6 +59,7 @@ int funcao_hash(string a, int tamanho); //funcionando
 
 void alocacao(class Unit *k , int tamanho , string palavra , int posicao);
 
+void busca(string a,class Unit* tabela,int *tamanho2,int *entrada2);
 
 class Unit* funcao_hehash(class Unit *k,int tamanho);
 //-----------------------------------------------------------------------------------------------------------------------------------
@@ -95,23 +96,9 @@ int main(){
 	    arquivo.close();
   	}
   	else cout<<"NAO FOI POSSIVEL ABRIR ARQUIVO"<<endl;
-    
-    int j;
-    for (j=0;j<=tamanho-1;j++){
-    	if(simplevector[j].isOcuped()==1){
-    		cout<<"Position :"<<j<<" ,KEY:"<< simplevector[j].get_string()<<endl;
-    		class Unit * percorre;
-			percorre = simplevector[j].get_pointer();
-			class Unit *aux;
-			while(percorre != NULL){
-					cout<<"Position :"<<j<<" ,KEY:"<<percorre->get_string()<<" "<<endl;
-					aux = percorre->get_pointer();//aux = percorre.next,percorre = aux ou seja , percorrer = percorre->next()
-					percorre = aux;
-					}
-    	}
-    }
-    
-  	
+    busca("XMWOPSSFHYBVCEWNTINJTZAXTFORRGHJOTKJM1LNCSDQVAIUNSQYVHLVDYCBUPLQKUCMMITKEHLXWUGZDRVVJCGZOABAADUTK",simplevector,&tamanho,&entrada); 
+    busca("UEOHHEGWLAKZDPUOBFIJIGMVUIMOSLCOBGLWHNWGUQWKTVJOPGZEWKWZEVCOEWTSMHCFOGVXDLXPUICINUSRMALIAOWMKYIWVFMSUIAPUOFP",simplevector,&tamanho,&entrada);   
+  	busca("EHOWZXTCMPDMLRNITIKOBQAMUBFLAJLRCPGIJOQKQOBWVIJRYBASSEJWAIIEXEQFHPIWRBRHZU",simplevector,&tamanho,&entrada); 
     return(0);
 }
 
@@ -119,8 +106,8 @@ int main(){
 int funcao_hash(string a,int tamanho){ //working
 	char    i  = (a[a.size()-1]);
 	char 	n  = (a[0]);
-	int    ki  = int(i);
-	int    ji  = int(n);
+	int     ki  = int(i);
+	int     ji  = int(n);
 	int  h  = a.size();
 	float  master = (h*(ji*ki));
 	ki = int (master); 
@@ -128,7 +115,7 @@ int funcao_hash(string a,int tamanho){ //working
 }
 
 
-class Unit* funcao_hehash(class Unit *k,int tamanho){
+class Unit* funcao_hehash(class Unit *k,int tamanho){//working
 	int copy = tamanho;
 	tamanho = tamanho * 2;
 	class Unit *l;
@@ -147,7 +134,7 @@ class Unit* funcao_hehash(class Unit *k,int tamanho){
 					class Unit * aux;
 					aux = percorre->get_pointer();//aux = percorre.next,percorre = aux ou seja , percorrer = percorre->next()
 					percorre = aux;	
-					}
+			}
 									
 				
 		}
@@ -157,7 +144,7 @@ class Unit* funcao_hehash(class Unit *k,int tamanho){
 	return (l);
 }
 
-void alocacao(class Unit *k , int tamanho , string palavra , int posicao){
+void alocacao(class Unit *k , int tamanho , string palavra , int posicao){//working
 	if(k[posicao].isOcuped() == 1){ //fazer alocacao na lista
 		Unit *z;
 		z = new Unit;
@@ -179,4 +166,78 @@ void alocacao(class Unit *k , int tamanho , string palavra , int posicao){
 
 }
  
+void busca(string a,class Unit* tabela,int *tamanho2,int* entrada2){ //working
+	int tamanho = *tamanho2;
+	int entrada = *entrada2;
+	int posicao =  funcao_hash(a,tamanho);
+	int achou = 0;
+	float fatorDeCrescimento2 = 0;
+	if(tabela[posicao].isOcuped()==1){ //Isocuped It means that there is something in this vector position
+		string comparison = tabela[posicao].get_string();
+		if(comparison.compare(a)==0){
+			cout<<"position of string : "<<posicao<<endl;
+		}
+		else{
+			class Unit *percorre,*aux;
+			percorre = tabela[posicao].get_pointer();
+			while(percorre!=NULL){
+				string copy = percorre->get_string();
+				if(copy.compare(a)==0){
+					cout<<"position of string : "<<posicao<<endl;
+					percorre = NULL;
+					achou++;
+					
+				}
+				else{
+					aux = percorre->get_pointer();
+					percorre = aux;
+				}
+			}
+			if(achou == 0){
+				fatorDeCrescimento2 = (tamanho/entrada);
+				cout<<"String not in the vector 1"<<endl;
+				entrada++;
+				if(fatorDeCrescimento2 <= 1.5 ){ // fator de crescimento = entrada/espaco na tabela hehash 
+		     		tabela = funcao_hehash(tabela,tamanho);
+		   			tamanho = tamanho * 2;
+		   			*entrada2 = entrada;
+					alocacao(tabela,tamanho,a,funcao_hash(a,tamanho)); // fazer uma funcao de insercao que verifica condições de hehash
+		       		tamanho2 = &tamanho;
+					
+		       	} 
+		      
+		      	else{ //insercao simples
 
+		      		*entrada2 = entrada;
+					alocacao(tabela,tamanho,a,funcao_hash(a,tamanho)); // fazer uma funcao de insercao que verifica condições de hehash
+		       		
+		        }	
+				
+		
+			}
+
+			
+		}
+	}
+	else{
+		cout<<"String not in the vector 2"<<endl;
+		fatorDeCrescimento2 = (tamanho/entrada);
+		entrada++;
+		entrada2 = &entrada;
+		if(fatorDeCrescimento2 <= 1.5 ){ // fator de crescimento = entrada/espaco na tabela hehash 
+		    tabela = funcao_hehash(tabela,tamanho);
+		   	tamanho = tamanho * 2;	
+			alocacao(tabela,tamanho,a,funcao_hash(a,tamanho)); // fazer uma funcao de insercao que verifica condições de hehash
+		    tamanho2 = &tamanho;
+		       		
+		} 
+		      
+		else{ //insercao simples
+		      		
+			alocacao(tabela,tamanho,a,funcao_hash(a,tamanho)); // fazer uma funcao de insercao que verifica condições de hehash
+			
+
+		}
+	}
+
+}
